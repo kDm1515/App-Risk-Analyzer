@@ -5,12 +5,11 @@ from analyzer.pdf_report import generate_pdf
 from database import init_db, save_analysis
 from database import get_all_analysis
 from flask import Flask, render_template, request, send_file
-from database import get_statistics
-
+from database import init_db, save_analysis
 import os
 
 app = Flask(__name__)
-
+init_db()
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 

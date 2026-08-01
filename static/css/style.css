@@ -1,47 +1,18 @@
-/* ===========================
-   Global Styles
-=========================== */
-
-html,
 body{
-    height:100%;
-    margin:0;
-    padding:0;
-    font-family:Arial, sans-serif;
+    font-family: Arial, sans-serif;
     background:#f4f4f4;
+    padding-top: 90px;
 }
-
-body{
-    display:flex;
-    flex-direction:column;
-    min-height:100vh;
-    padding-top:80px;
-}
-
-/* ===========================
-   Main Content
-=========================== */
-
-main{
-    flex:1;
-}
-
-/* ===========================
-   Container
-=========================== */
 
 .container{
-    max-width:1200px;
-    margin:40px auto;
+    width:500vh;
+    margin:80px auto;
     background:white;
     padding:30px;
-    border-radius:12px;
-    box-shadow:0 5px 15px rgba(0,0,0,.15);
+    border-radius:10px;
+    text-align:center;
+    box-shadow:0 0 10px rgba(0,0,0,.2);
 }
-
-/* ===========================
-   Buttons
-=========================== */
 
 button{
     background:#007bff;
@@ -49,221 +20,86 @@ button{
     border:none;
     padding:10px 20px;
     cursor:pointer;
-    border-radius:6px;
+    border-radius:5px;
     font-size:16px;
-    transition:.3s;
 }
 
 button:hover{
     background:#0056b3;
 }
 
-/* ===========================
-   Header
-=========================== */
-
 .header{
-
-    position:fixed;
-
-    top:0;
-    left:0;
-
-    width:100%;
-    height:80px;
-
-    background:#0f172a;
-
-    color:white;
-
     display:flex;
-    align-items:center;
     justify-content:space-between;
-
-    padding:0 30px;
-
-    z-index:1000;
-
-    box-shadow:0 2px 10px rgba(0,0,0,.3);
-
+    background-color: #0f172a;
+    padding-right: 400px;
 }
 
-/* ===========================
-   Header Buttons
-=========================== */
+.header{
+    position: fixed;      /* Keeps header fixed */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+
+    background-color: #0f172a;   /* Solid dark color */
+    color: white;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 30px;
+
+    z-index: 1000;        /* Keeps it above other content */
+
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
 
 .hd_btn{
-
-    background:#0095C8 !important;
+    background-color:#0095C8 !important;
     color:white !important;
-
-    border:none;
-
-    border-radius:6px;
-
-    padding:10px 20px;
-
-    transition:.3s;
+    border:none ;
+    font-size:16px;
+    border-radius:5px;
 
 }
 
 .hd_btn:hover{
-
-    background:#007ea8 !important;
+    background-color:#0081ac !important;
     color:white !important;
-
 }
-
-/* ===========================
-   Cards
-=========================== */
-
-.card{
-
-    border:none;
-
-    border-radius:12px;
-
-    box-shadow:0 3px 10px rgba(0,0,0,.15);
-
-}
-
-/* ===========================
-   Footer
-=========================== */
 
 .footer{
-
-    margin-top:auto;
-
     background:#0f172a;
-
     color:white;
-
     padding:40px 30px;
-
+    border-radius:15px 15px 0 0;
 }
 
 .footer h3,
 .footer h4{
-
     color:#00c8ff;
-
     margin-bottom:20px;
-
 }
 
 .footer p{
-
-    color:white;
-
+    color:#0f172a;
     line-height:1.8;
-
 }
 
 .footer a{
-
-    color:white;
-
+    color:#0f172a;
     text-decoration:none;
 
-    word-break:break-word;
-
+    /* Prevent long emails from overflowing */
+    word-break: break-word;
 }
 
 .footer a:hover{
-
     color:#00c8ff;
-
 }
 
 .footer hr{
-
     border-color:#334155;
-
-}
-
-/* ===========================
-   Tables
-=========================== */
-
-table{
-
-    width:100%;
-
-}
-
-th{
-
-    background:#0f172a;
-
-    color:white;
-
-}
-
-td,
-th{
-
-    padding:12px;
-
-    text-align:center;
-
-}
-
-/* ===========================
-   Images
-=========================== */
-
-img{
-
-    max-width:100%;
-
-    height:auto;
-
-}
-
-/* ===========================
-   Responsive
-=========================== */
-
-@media (max-width:768px){
-
-.header{
-
-    flex-direction:column;
-
-    height:auto;
-
-    padding:15px;
-
-}
-
-body{
-
-    padding-top:140px;
-
-}
-
-.container{
-
-    width:95%;
-
-    padding:20px;
-
-}
-
-.hd_btn{
-
-    margin:5px;
-
-    width:100%;
-
-}
-
-.footer{
-
-    text-align:center;
-
-}
-
 }

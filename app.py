@@ -72,14 +72,7 @@ def upload():
 
 @app.route("/dashboard")
 def dashboard():
-
-    stats = get_statistics()
-
-    return render_template(
-        "dashboard.html",
-        stats=stats
-    )
-
+    return "Dashboard is working"
 
 @app.route("/download")
 def download():

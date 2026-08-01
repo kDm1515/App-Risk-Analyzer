@@ -1,0 +1,56 @@
+/* Light Theme */
+body {
+    background: #f8f9fa;
+    color: #212529;
+    transition: 0.3s;
+}
+
+/* Dark Theme */
+body.dark-mode {
+    background: #121212;
+    color: #ffffff;
+}
+
+/* Cards */
+body.dark-mode .card {
+    background: #1e1e1e;
+    color: white;
+    border: 1px solid #333;
+}
+
+/* Navbar/Header */
+body.dark-mode .navbar,
+body.dark-mode header {
+    background: #1b1b1b !important;
+}
+
+/* Tables */
+body.dark-mode table {
+    color: white;
+}
+
+body.dark-mode th,
+body.dark-mode td {
+    border-color: #555;
+}
+
+/* Footer */
+body.dark-mode footer {
+    background: #1b1b1b;
+    color: white;
+}
+
+/* Buttons */
+body.dark-mode .btn-success {
+    background: #00b894;
+    border: none;
+}
+
+/* Input */
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+    background: #2b2b2b;
+    color: white;
+    border: 1px solid #555;
+}

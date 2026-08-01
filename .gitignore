@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+.venv/
+
+# Environment Variables
+.env
+
+# Uploaded Files
+uploads/
+
+# Database (optional)
+app_risk.db
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store

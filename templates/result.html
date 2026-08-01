@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>App Risk Analyzer</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+            <h2>📱 App Risk Analyzer</h2>
+        </div>
+
+        <div class="card-body">
+
+            <h3 class="text-primary">{{ app.app_name }}</h3>
+
+            <table class="table table-bordered">
+
+                <tr>
+                    <td><b>Package</b></td>
+                    <td>{{ app.package_name }}</td>
+                </tr>
+
+                <tr>
+                    <td><b>Version</b></td>
+                    <td>{{ app.version_name }}</td>
+                </tr>
+
+            </table>
+
+            <hr>
+
+            <h3>Risk Score</h3>
+
+            <div class="progress mb-3" style="height:30px;">
+
+                <div
+                    class="progress-bar
+                    {% if risk.score >= 70 %}
+                        bg-danger
+                    {% elif risk.score >= 40 %}
+                        bg-warning
+                    {% else %}
+                        bg-success
+                    {% endif %}"
+                    role="progressbar"
+                    style="width: {{ risk.score }}%;">
+
+                    {{ risk.score }}%
+
+                </div>
+
+            </div>
+
+            <h4>
+
+                Verdict :
+
+                <span
+                    class="
+                    {% if risk.score >= 70 %}
+                        text-danger
+                    {% elif risk.score >= 40 %}
+                        text-warning
+                    {% else %}
+                        text-success
+                    {% endif %}
+                    ">
+
+                    {{ risk.verdict }}
+
+                </span>
+
+            </h4>
+
+            <hr>
+
+            <h3>Permissions</h3>
+
+            <table class="table table-bordered table-hover">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Permission</th>
+                        <th>Risk</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                {% for p in risk.permissions %}
+
+                    <tr>
+
+                        <td>{{ p.permission }}</td>
+
+                        <td>
+
+                            {% if p.risk == "High" %}
+
+                                <span class="badge bg-danger">High</span>
+
+                            {% elif p.risk == "Medium" %}
+
+                                <span class="badge bg-warning text-dark">Medium</span>
+
+                            {% else %}
+
+                                <span class="badge bg-success">Low</span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            <hr>
+
+            <div class="alert alert-info">
+
+                <div class="card shadow-lg mt-4">
+
+    <div class="card-header bg-primary text-white">
+        <h4>🤖 AI Security Report</h4>
+    </div>
+
+    <div class="card-body">
+
+        <pre style="white-space: pre-wrap;
+                    font-family: Arial;
+                    font-size:16px;">
+                    {{ ai_report }}
+        </pre>
+
+    </div>
+
+</div>
+
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+
+                <a href="/" class="btn btn-primary">
+                    🔄 Analyze Another App
+                </a>
+
+                <a
+                    class="btn btn-danger"
+                    href="{{ url_for('download', file=pdf_file) }}">
+
+                    📄 Download PDF Report
+
+                </a>
+
+                <a href="/dashboard" class="btn btn-success">
+                    📊 Dashboard
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+</body>
+
+</html>

@@ -1,11 +1,21 @@
+html,
 body{
-    font-family: Arial, sans-serif;
+    height:100%;
+    margin:0;
+    padding:0;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-top:80px;
+    font-family:Arial,sans-serif;
     background:#f4f4f4;
-    padding-top: 90px;
 }
 
 .container{
-    width:500vh;
+    width:1200px;
     margin:80px auto;
     background:white;
     padding:30px;
@@ -74,9 +84,7 @@ button:hover{
     background:#0f172a;
     color:white;
     padding:40px 30px;
-    border-radius:15px 15px 0 0;
-    margin-bottom : 0;
-    padding-bottom : 0;
+    border-radius:15px 15px 0 0;    
 }
 
 .footer h3,

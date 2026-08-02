@@ -2,10 +2,9 @@ from analyzer.apk_parser import analyze_apk
 from analyzer.risk_score import calculate_risk
 from analyzer.groq_ai import analyze_permissions
 from analyzer.pdf_report import generate_pdf
-from database import init_db, save_analysis
-from database import get_all_analysis
 from flask import Flask, render_template, request, send_file
-from database import init_db, save_analysis
+from database import init_db, save_analysis, get_all_analysis, get_statistics
+from werkzeug.utils import secure_filename
 import os
 
 app = Flask(__name__)
@@ -32,7 +31,13 @@ def upload():
     if file.filename == "":
         return "Please choose an APK."
 
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+    if not file.filename.lower().endswith(".apk"):
+        return "Only APK files are allowed."
+
+    
+
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
     file.save(filepath)
 
     # Analyze APK
@@ -102,5 +107,4 @@ def history():
     )
 
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)

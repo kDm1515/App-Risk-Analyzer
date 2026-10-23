@@ -1,170 +1,1147 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>App Risk Analyzer</title>
+    <title>App Risk Analyzer | Security Assessment</title>
+    <meta name="theme-color" content="#0b1220">
+    <meta name="description"
+          content="Analyze Android APKs, inspect website security, and review Google Play Store app listings.">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/theme.css') }}">
+
+    <style>
+        :root {
+            --home-bg: #0b1220;
+            --home-card: #111c2e;
+            --home-border: #26354b;
+            --home-text: #edf4ff;
+            --home-muted: #94a8c5;
+            --home-cyan: #00d4ff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 25px;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--home-bg) !important;
+            color: var(--home-text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .site-header {
+            background: #0e192b;
+            border-bottom: 1px solid var(--home-border);
+            position: relative;
+            z-index: 5;
+        }
+
+        .nav-inner {
+            max-width: 1440px;
+            min-height: 88px;
+            margin: auto;
+            padding: 12px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .brand img {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .brand h1 {
+            color: #fff;
+            font-size: 21px;
+            font-weight: 750;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .brand h1 span {
+            color: var(--home-cyan);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .nav-link-custom {
+            color: #c2cee0;
+            padding: 10px 14px;
+            border-radius: 9px;
+            font-size: 14px;
+            transition: background .2s, color .2s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            background: #192b42;
+            color: var(--home-cyan);
+        }
+
+        .hero {
+            max-width: 1440px;
+            margin: auto;
+            padding: 65px 28px 70px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, .85fr);
+            align-items: center;
+            gap: 65px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 12px;
+            border: 1px solid #24516b;
+            border-radius: 30px;
+            background: #10273b;
+            color: var(--home-cyan);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4ade80;
+            flex-shrink: 0;
+        }
+
+        .hero-title {
+            margin: 24px 0 20px;
+            color: #fff;
+            font-size: clamp(36px, 5vw, 62px);
+            font-weight: 800;
+            letter-spacing: -1.8px;
+            line-height: 1.12;
+        }
+
+        .hero-title span {
+            color: var(--home-cyan);
+        }
+
+        .hero-description {
+            max-width: 590px;
+            color: var(--home-muted);
+            font-size: 16px;
+            line-height: 1.9;
+            margin-bottom: 28px;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn-primary-custom,
+        .btn-secondary-custom {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 13px 19px;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        .btn-primary-custom {
+            border: 1px solid var(--home-cyan);
+            background: var(--home-cyan);
+            color: #071421;
+            font-weight: 750;
+        }
+
+        .btn-primary-custom:hover {
+            background: #8cecff;
+            border-color: #8cecff;
+            color: #071421;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary-custom {
+            border: 1px solid #34445d;
+            color: #e2ebf8;
+            font-weight: 600;
+        }
+
+        .btn-secondary-custom:hover {
+            border-color: var(--home-cyan);
+            color: var(--home-cyan);
+            background: #112238;
+        }
+
+        .hero-note {
+            color: #7186a4;
+            font-size: 12px;
+            margin-top: 19px;
+            line-height: 1.7;
+        }
+
+        /* Unified analysis box */
+
+        .upload-card {
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+            background: var(--home-card);
+            border: 1px solid #2b3d55;
+            border-radius: 20px;
+            box-shadow: 0 24px 65px rgba(0, 0, 0, .22);
+        }
+
+        .upload-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--home-cyan), #648bff);
+        }
+
+        .upload-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 62px;
+            height: 62px;
+            margin-bottom: 22px;
+            border: 1px solid #24516b;
+            border-radius: 16px;
+            background: #102b40;
+            color: var(--home-cyan);
+            font-size: 29px;
+        }
+
+        .upload-heading {
+            color: #fff;
+            font-size: 25px;
+            font-weight: 750;
+            margin-bottom: 10px;
+        }
+
+        .upload-description {
+            color: var(--home-muted);
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        .field-label {
+            display: block;
+            color: #e7f0fc;
+            font-size: 13px;
+            font-weight: 650;
+            margin-bottom: 9px;
+        }
+
+        .analysis-select,
+        .analysis-url {
+            width: 100%;
+            min-height: 48px;
+            padding: 12px 13px;
+            border: 1px solid #30435c;
+            border-radius: 9px;
+            background: #0d192a;
+            color: #edf4ff;
+            font-size: 14px;
+        }
+
+        .analysis-select:focus,
+        .analysis-url:focus {
+            outline: none;
+            border-color: var(--home-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, .12);
+        }
+
+        .analysis-select option {
+            background: #111c2e;
+            color: #fff;
+        }
+
+        .input-help {
+            margin-top: 9px;
+            color: var(--home-muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .file-drop {
+            display: block;
+            padding: 23px 16px;
+            border: 1px dashed #42617d;
+            border-radius: 12px;
+            background: #0d192a;
+            text-align: center;
+            transition: border-color .2s, background .2s;
+        }
+
+        .file-drop:focus-within,
+        .file-drop:hover {
+            border-color: var(--home-cyan);
+            background: #102136;
+        }
+
+        .file-symbol {
+            font-size: 27px;
+            margin-bottom: 10px;
+        }
+
+        .file-prompt {
+            color: #e7f0fc;
+            font-size: 14px;
+            font-weight: 650;
+            overflow-wrap: anywhere;
+        }
+
+        .file-input {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            color: #dbe7f6;
+            background: #152238;
+            border: 1px solid #30435c;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .file-input::file-selector-button {
+            margin-right: 10px;
+            padding: 7px 10px;
+            border: 0;
+            border-radius: 6px;
+            background: #263b55;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .file-input:focus-visible {
+            outline: 2px solid var(--home-cyan);
+            outline-offset: 3px;
+        }
+
+        .upload-submit {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            border: 1px solid var(--home-cyan);
+            border-radius: 9px;
+            background: var(--home-cyan);
+            color: #071421;
+            font-size: 14px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .upload-submit:hover {
+            background: #8cecff;
+            border-color: #8cecff;
+        }
+
+        .upload-submit:disabled {
+            opacity: .65;
+            cursor: wait;
+        }
+
+        .privacy-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            margin-top: 18px;
+            color: var(--home-muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .privacy-note span {
+            color: #4ade80;
+            flex-shrink: 0;
+        }
+
+        /* Features */
+
+        .features-section {
+            padding: 58px 28px 68px;
+            background: #0e192b;
+            border-top: 1px solid var(--home-border);
+            border-bottom: 1px solid var(--home-border);
+        }
+
+        .section-inner {
+            max-width: 1384px;
+            margin: auto;
+        }
+
+        .section-heading {
+            color: #fff;
+            font-size: clamp(25px, 3vw, 34px);
+            font-weight: 750;
+            margin-bottom: 12px;
+        }
+
+        .section-description {
+            max-width: 650px;
+            color: var(--home-muted);
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 32px;
+        }
+
+        .feature-card {
+            height: 100%;
+            padding: 24px;
+            background: var(--home-card);
+            border: 1px solid var(--home-border);
+            border-radius: 15px;
+            transition: transform .2s, border-color .2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            border-color: #3a5b79;
+        }
+
+        .feature-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 43px;
+            height: 43px;
+            margin-bottom: 18px;
+            border-radius: 12px;
+            background: #132e43;
+            color: var(--home-cyan);
+            font-size: 22px;
+        }
+
+        .feature-title {
+            color: #f5f8ff;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature-text {
+            color: var(--home-muted);
+            font-size: 13px;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        /* Footer */
+
+        .site-footer {
+            background: #080f1b;
+            border-top: 1px solid #1d2a3e;
+            padding: 48px 28px 22px;
+            scroll-margin-top: 20px;
+        }
+
+        .footer-inner {
+            max-width: 1384px;
+            margin: auto;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-size: 19px;
+            font-weight: 750;
+            margin-bottom: 17px;
+        }
+
+        .footer-brand img {
+            width: 37px;
+            height: 37px;
+            object-fit: contain;
+        }
+
+        .footer-text {
+            max-width: 360px;
+            color: var(--home-muted);
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+        .footer-heading {
+            color: #f4f7fc;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 13px;
+        }
+
+        .footer-links a,
+        .contact-link {
+            color: var(--home-muted);
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+            transition: color .2s;
+        }
+
+        .footer-links a:hover,
+        .contact-link:hover {
+            color: var(--home-cyan);
+        }
+
+        .footer-divider {
+            margin: 28px 0 20px;
+            border-color: #263247;
+            opacity: 1;
+        }
+
+        .copyright {
+            color: #8193ad;
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        @media (min-width: 992px) {
+            .hero {
+                min-height: 590px;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .hero {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 40px;
+                padding-top: 52px;
+                padding-bottom: 52px;
+            }
+
+            .hero-copy {
+                max-width: 700px;
+            }
+
+            .upload-card {
+                width: 100%;
+                max-width: 620px;
+                margin: auto;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .nav-inner {
+                padding: 15px 16px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+            }
+
+            .brand img {
+                width: 43px;
+                height: 43px;
+            }
+
+            .brand h1 {
+                font-size: 19px;
+            }
+
+            .nav-links {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 7px;
+            }
+
+            .nav-link-custom {
+                padding: 11px 8px;
+                text-align: center;
+                font-size: 13px;
+                background: #142238;
+            }
+
+            .hero {
+                padding: 42px 16px;
+                gap: 32px;
+            }
+
+            .hero-title {
+                font-size: clamp(35px, 9vw, 49px);
+                letter-spacing: -1px;
+            }
+
+            .hero-description {
+                font-size: 14px;
+                line-height: 1.85;
+            }
+
+            .hero-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .hero-actions a {
+                width: 100%;
+            }
+
+            .upload-card {
+                padding: 23px 18px;
+                border-radius: 16px;
+            }
+
+            .upload-heading {
+                font-size: 22px;
+            }
+
+            .features-section {
+                padding: 42px 16px;
+            }
+
+            .feature-card {
+                padding: 21px;
+            }
+
+            .site-footer {
+                padding: 38px 18px 20px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .brand h1 {
+                font-size: 17px;
+            }
+
+            .upload-card {
+                padding: 20px 14px;
+            }
+
+            .file-drop {
+                padding: 18px 10px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *, *::before, *::after {
+                transition: none !important;
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-light">
-<main>
-<header>
-    <div class="header">
-        <div class="d-flex align-items-center ms-3">
-        <img src="{{ url_for('static', filename='images/apklogo.png') }}"
-            alt="Logo"
-            width="75"
-            height="75"
-            class="me-2">
+<body>
 
-        <h3 class="text-white m-0">
-            App Risk <span class="text-info">Analyzer</span>
-        </h3>
-    </div>
-        <div>
-            <a href="/" class="btn btn-success m-3 hd_btn button">
-                Home
-            </a>
+<header class="site-header">
+    <nav class="nav-inner" aria-label="Main navigation">
+
+        <a href="/" class="brand" aria-label="App Risk Analyzer home">
+            <img
+                src="{{ url_for('static', filename='images/apklogo.png') }}"
+                alt="App Risk Analyzer logo">
+
+            <h1>App Risk <span>Analyzer</span></h1>
+        </a>
+
+        <div class="nav-links">
+            <a href="/" class="nav-link-custom active" aria-current="page">Home</a>
+            <a href="/dashboard" class="nav-link-custom">Dashboard</a>
+            <a href="/history" class="nav-link-custom">History</a>
+            <a href="#contact" class="nav-link-custom">Contact us</a>
         </div>
-        <div>
-            <a href="/dashboard" class="btn btn-primary m-3 hd_btn button">
-                Dashboard
-            </a>
-        </div>
-        <div>
-            <a href="/history" class="btn btn-secondary m-3 hd_btn button">
-                History
-            </a>
-        </div>
-        <div>
-            <a href="#contact" class="btn btn-info m-3 hd_btn button">
-                Contact us
-            </a>
-        </div>
-    </div>
+
+    </nav>
 </header>
 
-<div class="container">
+<main>
 
-    <div class="row justify-content-center mt-5">
+    <!-- Hero and one unified analyzer -->
+    <section class="hero">
 
-        <div class="col-md-6">
+        <div class="hero-copy">
 
-            <div class="card shadow">
+            <div class="eyebrow">
+                <span class="status-dot"></span>
+                Website &amp; app security
+            </div>
 
-                <div class="card-header bg-primary text-white">
+            <h2 class="hero-title">
+                Understand Security
+                <span>Before You Trust.</span>
+            </h2>
 
-                    <h2>📱 App Risk Analyzer</h2>
+            <p class="hero-description">
+                Analyze Android applications, inspect website security
+                headers, and review Google Play Store listings from
+                one simple interface. Get structured findings to help
+                you understand potential privacy and security concerns.
+            </p>
 
+            <div class="hero-actions">
+                <a href="#analyze" class="btn-primary-custom">
+                    Start Analysis <span aria-hidden="true">→</span>
+                </a>
+
+                <a href="/dashboard" class="btn-secondary-custom">
+                    View Dashboard
+                </a>
+            </div>
+
+            <p class="hero-note">
+                Results are preliminary assessments, not a guarantee
+                that a website or application is safe or malicious.
+                Only inspect files and URLs you are authorized to use.
+            </p>
+
+        </div>
+
+        <!-- Only one analysis box -->
+        <div class="upload-card" id="analyze">
+
+            <div class="upload-icon" aria-hidden="true">⌕</div>
+
+            <h2 class="upload-heading">Security Analyzer</h2>
+
+            <p class="upload-description">
+                Choose an analysis method below. The required input
+                will update automatically.
+            </p>
+
+            <form id="analysisForm"
+                  method="POST"
+                  action="/upload"
+                  enctype="multipart/form-data">
+
+                <div class="mb-4">
+                    <label for="analysisType" class="field-label">
+                        What do you want to analyze?
+                    </label>
+
+                    <select
+                        id="analysisType"
+                        name="analysis_type"
+                        class="analysis-select"
+                        required>
+
+                        <option value="apk_upload">Upload an APK file</option>
+                        <option value="website">Website Security URL</option>
+                        <option value="play_store">Google Play Store URL</option>
+                        <option value="apk_url">Direct APK Download URL</option>
+                    </select>
                 </div>
 
-                <div class="card-body">
+                <!-- Local APK file input -->
+                <div id="fileInputGroup">
+                    <label class="file-drop" for="apkfile">
 
-                    <p>
-                        Upload an Android APK file to evaluate its privacy and security risks using AI.
-                    </p>
+                        <div class="file-symbol" aria-hidden="true">📦</div>
 
-                    <form action="/upload" method="POST" enctype="multipart/form-data">
+                        <div class="file-prompt" id="filePrompt">
+                            Choose an APK file
+                        </div>
+
+                        <div class="input-help">
+                            Select an Android package file (.apk)
+                        </div>
 
                         <input
-                            class="form-control"
+                            id="apkfile"
+                            class="file-input"
                             type="file"
                             name="apkfile"
-                            accept=".apk"
-                            required>
+                            accept=".apk,application/vnd.android.package-archive">
 
-                        <br>
+                    </label>
+                </div>
 
-                        <button class="btn btn-success w-100">
-                            Analyze APK
-                        </button>
+                <!-- URL input for website, Play Store, or direct APK -->
+                <div id="urlInputGroup" hidden>
+                    <label for="analysisUrl" class="field-label">
+                        Enter URL
+                    </label>
 
-                    </form>
+                    <input
+                        type="url"
+                        class="analysis-url"
+                        id="analysisUrl"
+                        name="url"
+                        placeholder="https://example.com"
+                        maxlength="2048"
+                        autocomplete="url">
 
-                    
-
+                    <div class="input-help" id="urlHelp">
+                        Enter the public website address you want to inspect.
                     </div>
+                </div>
 
+                <button type="submit"
+                        class="upload-submit"
+                        id="analyzeButton">
+                    Analyze Now →
+                </button>
+
+            </form>
+
+            <div class="privacy-note">
+                <span aria-hidden="true">●</span>
+                <div>
+                    Submit only public URLs you are authorized to inspect.
+                    Direct APK links must download an actual APK file.
+                    Google Play listing analysis does not verify the
+                    internal security of the app.
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Features -->
+    <section class="features-section">
+        <div class="section-inner">
+
+            <div class="eyebrow mb-3">What you can review</div>
+
+            <h2 class="section-heading">
+                Security insights in one place
+            </h2>
+
+            <p class="section-description">
+                Explore application permissions, website security
+                headers, and accessible app listing information
+                through a single interface.
+            </p>
+
+            <div class="row g-3">
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <article class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">⌘</div>
+                        <h3 class="feature-title">Permission Analysis</h3>
+                        <p class="feature-text">
+                            Review permissions related to SMS, contacts,
+                            location, camera, microphone, and other
+                            device capabilities detected in an APK.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <article class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">◈</div>
+                        <h3 class="feature-title">Risk Assessment</h3>
+                        <p class="feature-text">
+                            Examine risk scores and severity classifications
+                            produced by the existing analysis pipeline.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <article class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">✧</div>
+                        <h3 class="feature-title">AI Security Insights</h3>
+                        <p class="feature-text">
+                            Review AI-generated explanations and
+                            recommendations when the configured AI service
+                            is available.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <article class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">◎</div>
+                        <h3 class="feature-title">Website Security</h3>
+                        <p class="feature-text">
+                            Check HTTPS, HTTP response status, and selected
+                            security headers on a public website.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <article class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">▣</div>
+                        <h3 class="feature-title">Play Store Inspection</h3>
+                        <p class="feature-text">
+                            Inspect accessible Google Play listing details
+                            and identify the package ID when available.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <article class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">↓</div>
+                        <h3 class="feature-title">Reports &amp; History</h3>
+                        <p class="feature-text">
+                            Access your existing dashboard, analysis history,
+                            and downloadable reports where supported.
+                        </p>
+                    </article>
                 </div>
 
             </div>
 
         </div>
-
-    </div>
-
-</div>
+    </section>
 
 </main>
 
-<footer class="footer mt-5">
-    <div class="container">
-        <div class="row">
+<footer class="site-footer" id="contact">
+    <div class="footer-inner">
 
-            <!-- Project -->
-            <div class="col-md-4 mb-4">
-                <h3>
-                <img src="{{ url_for('static', filename='images/apklogo.png') }}"
-                alt="Logo"
-                width="35"
-                height="35"
-                class="me-2"> 
-                App Risk Analyzer</h3>
-                <p>
-                    AI-powered Android application security analyzer.
-                    Detect privacy risks, dangerous permissions,
-                    and generate security reports.
+        <div class="row g-4">
+
+            <div class="col-12 col-md-5">
+                <div class="footer-brand">
+                    <img
+                        src="{{ url_for('static', filename='images/apklogo.png') }}"
+                        alt="">
+
+                    <span>App Risk Analyzer</span>
+                </div>
+
+                <p class="footer-text">
+                    An AI-assisted application privacy and security
+                    assessment system designed to help users examine
+                    Android permissions, website security headers,
+                    and potential risks.
                 </p>
             </div>
 
-            <!-- Links -->
-            <div class="col-md-3 mb-4">
-                <h4>Quick Links</h4>
+            <div class="col-6 col-md-3">
+                <h3 class="footer-heading">Quick Links</h3>
 
-                <a href="/">🏠 Home</a><br>
-                <a href="/dashboard">📊 Dashboard</a><br>
-                <a href="/history">📜 History</a>
+                <div class="footer-links">
+                    <a href="/">Home</a>
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/history">Analysis History</a>
+                    <a href="#analyze">Security Analyzer</a>
+                </div>
             </div>
 
-            <!-- Contact -->
-            <div class="col-md-5 mb-4" id="contact">
-                <h4>📧 Contact Team</h4>
+            <div class="col-12 col-md-4">
+                <h3 class="footer-heading">Contact Team</h3>
 
-                <p>
-                    <a href="mailto:2302031800039@silveroakuni.ac.in">
+                <div class="footer-links">
+                    <a class="contact-link"
+                       href="mailto:2302031800039@silveroakuni.ac.in">
                         2302031800039@silveroakuni.ac.in
                     </a>
-                </p>
 
-                <p>
-                    <a href="mailto:2302031800006@silveroakuni.ac.in">
+                    <a class="contact-link"
+                       href="mailto:2302031800006@silveroakuni.ac.in">
                         2302031800006@silveroakuni.ac.in
                     </a>
-                </p>
 
-                <p>
-                    <a href="mailto:2302031800027@silveroakuni.ac.in">
+                    <a class="contact-link"
+                       href="mailto:2302031800027@silveroakuni.ac.in">
                         2302031800027@silveroakuni.ac.in
                     </a>
-                </p>
-
+                </div>
             </div>
 
         </div>
 
-        <hr>
+        <hr class="footer-divider">
 
-        <p class="text-center mb-0">
-            <b>© 2026 App Risk Analyzer | Developed by Team KD</b>
+        <p class="copyright mb-0">
+            <strong>© 2026 App Risk Analyzer | Developed by Team KD</strong>
+            <br>
+            Application security assessment and privacy awareness.
         </p>
 
     </div>
 </footer>
 
-</body>
+<script>
+    const analysisType = document.getElementById("analysisType");
+    const analysisForm = document.getElementById("analysisForm");
+    const fileInputGroup = document.getElementById("fileInputGroup");
+    const urlInputGroup = document.getElementById("urlInputGroup");
+    const apkInput = document.getElementById("apkfile");
+    const analysisUrl = document.getElementById("analysisUrl");
+    const filePrompt = document.getElementById("filePrompt");
+    const urlHelp = document.getElementById("urlHelp");
+    const analyzeButton = document.getElementById("analyzeButton");
 
+    const urlOptions = {
+        website: {
+            placeholder: "https://example.com",
+            help: "Enter the public website address you want to inspect."
+        },
+        play_store: {
+            placeholder: "https://play.google.com/store/apps/details?id=com.example.app",
+            help: "Paste a Google Play Store app listing URL."
+        },
+        apk_url: {
+            placeholder: "https://example.com/download/app.apk",
+            help: "Enter a direct HTTPS download link to an APK file."
+        }
+    };
+
+    function updateAnalysisType() {
+        const type = analysisType.value;
+        const isUpload = type === "apk_upload";
+
+        fileInputGroup.hidden = !isUpload;
+        urlInputGroup.hidden = isUpload;
+
+        apkInput.required = isUpload;
+        analysisUrl.required = !isUpload;
+
+        // The backend route depends on the selected analysis type.
+        analysisForm.action = isUpload ? "/upload" : "/analyze-url";
+
+        if (!isUpload) {
+            const selected = urlOptions[type];
+            analysisUrl.placeholder = selected.placeholder;
+            urlHelp.textContent = selected.help;
+        }
+
+        analyzeButton.textContent = isUpload
+            ? "Analyze APK →"
+            : "Analyze URL →";
+    }
+
+    analysisType.addEventListener("change", updateAnalysisType);
+
+    apkInput.addEventListener("change", function () {
+        const file = this.files && this.files.length
+            ? this.files[0]
+            : null;
+
+        filePrompt.textContent = file
+            ? file.name
+            : "Choose an APK file";
+    });
+
+    analysisForm.addEventListener("submit", function (event) {
+        const type = analysisType.value;
+
+        if (type === "apk_upload") {
+            const file = apkInput.files && apkInput.files.length
+                ? apkInput.files[0]
+                : null;
+
+            if (!file) {
+                event.preventDefault();
+                apkInput.reportValidity();
+                return;
+            }
+
+            if (!file.name.toLowerCase().endsWith(".apk")) {
+                event.preventDefault();
+                alert("Please select an Android APK file.");
+                apkInput.value = "";
+                filePrompt.textContent = "Choose an APK file";
+                return;
+            }
+
+            analyzeButton.disabled = true;
+            analyzeButton.textContent = "Uploading APK...";
+            return;
+        }
+
+        const value = analysisUrl.value.trim();
+
+        if (!value) {
+            event.preventDefault();
+            analysisUrl.reportValidity();
+            return;
+        }
+
+        let parsedUrl;
+
+        try {
+            parsedUrl = new URL(value);
+        } catch {
+            event.preventDefault();
+            alert("Please enter a valid URL.");
+            return;
+        }
+
+        if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+            event.preventDefault();
+            alert("Only HTTP and HTTPS URLs are supported.");
+            return;
+        }
+
+        if (
+            type === "play_store" &&
+            !(
+                parsedUrl.hostname === "play.google.com" &&
+                parsedUrl.pathname === "/store/apps/details"
+            )
+        ) {
+            event.preventDefault();
+            alert("Please enter a valid Google Play Store app listing URL.");
+            return;
+        }
+
+        if (type === "apk_url" && parsedUrl.protocol !== "https:") {
+            event.preventDefault();
+            alert("Direct APK download URLs must use HTTPS.");
+            return;
+        }
+
+        analyzeButton.disabled = true;
+        analyzeButton.textContent = "Analyzing URL...";
+    });
+
+    updateAnalysisType();
+</script>
+
+</body>
 </html>

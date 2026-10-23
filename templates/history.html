@@ -1,88 +1,584 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Analysis History</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Analysis History | App Risk Analyzer</title>
+    <meta name="theme-color" content="#0b1220">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/theme.css') }}">
+
+    <style>
+        :root {
+            --history-bg: #0b1220;
+            --history-card: #111c2e;
+            --history-border: #26354b;
+            --history-text: #edf4ff;
+            --history-muted: #94a8c5;
+            --history-cyan: #00d4ff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--history-bg) !important;
+            color: var(--history-text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .site-header {
+            background: #0e192b;
+            border-bottom: 1px solid var(--history-border);
+        }
+
+        .nav-inner {
+            max-width: 1440px;
+            min-height: 88px;
+            margin: auto;
+            padding: 12px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .brand img {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .brand h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 21px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .brand h1 span {
+            color: var(--history-cyan);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .nav-link-custom {
+            color: #c2cee0;
+            padding: 10px 14px;
+            border-radius: 9px;
+            font-size: 14px;
+            transition: background .2s, color .2s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            background: #192b42;
+            color: var(--history-cyan);
+        }
+
+        .history-main {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 42px 28px 55px;
+            flex: 1;
+        }
+
+        .eyebrow {
+            margin-bottom: 10px;
+            color: var(--history-cyan);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .page-title {
+            margin: 0 0 12px;
+            color: #fff;
+            font-size: clamp(28px, 4vw, 38px);
+            font-weight: 800;
+        }
+
+        .page-description {
+            margin: 0;
+            color: var(--history-muted);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .history-panel {
+            margin-top: 30px;
+            overflow: hidden;
+            background: var(--history-card);
+            border: 1px solid var(--history-border);
+            border-radius: 16px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 23px 25px;
+            border-bottom: 1px solid var(--history-border);
+        }
+
+        .panel-title {
+            margin: 0;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .panel-subtitle {
+            margin: 7px 0 0;
+            color: var(--history-muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .history-count {
+            display: inline-block;
+            padding: 8px 12px;
+            border: 1px solid #28516a;
+            border-radius: 20px;
+            background: #10273b;
+            color: var(--history-cyan);
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .history-table {
+            width: 100%;
+            min-width: 680px;
+            margin: 0;
+            border-collapse: collapse;
+            color: var(--history-text);
+            vertical-align: middle;
+        }
+
+        .history-table thead th {
+            padding: 17px 22px;
+            background: #142238;
+            border-bottom: 1px solid #304159;
+            color: #9fb4d1;
+            font-size: 11px;
+            font-weight: 750;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .history-table tbody td {
+            padding: 19px 22px;
+            background: var(--history-card);
+            color: #dce7f7;
+            border-bottom: 1px solid #243249;
+            font-size: 13px;
+        }
+
+        .history-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .history-table tbody tr:hover td {
+            background: #15243a;
+        }
+
+        .app-name {
+            max-width: 240px;
+            color: #fff;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .package-name {
+            max-width: 240px;
+            color: var(--history-muted);
+            overflow-wrap: anywhere;
+        }
+
+        .version-text {
+            color: #c3d0e3;
+            overflow-wrap: anywhere;
+        }
+
+        .score-value {
+            color: var(--history-cyan);
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .verdict-badge {
+            display: inline-block;
+            padding: 7px 11px;
+            border: 1px solid #3c4d66;
+            border-radius: 20px;
+            background: #1a2b42;
+            color: #dbeafe;
+            font-size: 11px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .verdict-high {
+            color: #fda4af;
+            background: #3d1e2d;
+            border-color: #753448;
+        }
+
+        .verdict-medium {
+            color: #fcd34d;
+            background: #3c311c;
+            border-color: #665025;
+        }
+
+        .verdict-low {
+            color: #86efac;
+            background: #17362e;
+            border-color: #285c49;
+        }
+
+        .empty-state {
+            padding: 55px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 18px;
+            border: 1px solid #2b4967;
+            border-radius: 18px;
+            background: #152a40;
+            color: var(--history-cyan);
+            font-size: 27px;
+        }
+
+        .empty-title {
+            margin-bottom: 10px;
+            color: #fff;
+            font-size: 19px;
+            font-weight: 750;
+        }
+
+        .empty-description {
+            max-width: 430px;
+            margin: 0 auto 22px;
+            color: var(--history-muted);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .btn-analyze {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 19px;
+            border: 1px solid var(--history-cyan);
+            border-radius: 9px;
+            background: var(--history-cyan);
+            color: #071421;
+            font-size: 13px;
+            font-weight: 750;
+            transition: .2s;
+        }
+
+        .btn-analyze:hover {
+            background: #8cecff;
+            border-color: #8cecff;
+            color: #071421;
+        }
+
+        .panel-footer {
+            padding: 15px 24px;
+            border-top: 1px solid var(--history-border);
+            color: var(--history-muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .site-footer {
+            padding: 21px 16px;
+            border-top: 1px solid var(--history-border);
+            background: #080f1b;
+            color: #8193ad;
+            text-align: center;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 767px) {
+            .nav-inner {
+                padding: 15px 16px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+            }
+
+            .brand img {
+                width: 43px;
+                height: 43px;
+            }
+
+            .brand h1 {
+                font-size: 19px;
+            }
+
+            .nav-links {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 7px;
+            }
+
+            .nav-link-custom {
+                padding: 11px 8px;
+                background: #142238;
+                text-align: center;
+                font-size: 13px;
+            }
+
+            .history-main {
+                padding: 30px 15px 40px;
+            }
+
+            .history-panel {
+                margin-top: 23px;
+                border-radius: 12px;
+            }
+
+            .panel-header {
+                align-items: flex-start;
+                padding: 19px 16px;
+            }
+
+            .panel-title {
+                font-size: 16px;
+            }
+
+            .history-table thead th,
+            .history-table tbody td {
+                padding: 16px;
+            }
+
+            .panel-footer {
+                padding: 14px 16px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .brand h1 {
+                font-size: 17px;
+            }
+
+            .panel-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<header>
-    <div class="header">
-        <div class="d-flex align-items-center ms-3">
-        <img src="{{ url_for('static', filename='images/apklogo.png') }}"
-            alt="Logo"
-            width="75"
-            height="75"
-            class="me-2">
+<header class="site-header">
+    <nav class="nav-inner" aria-label="Main navigation">
 
-        <h3 class="text-white m-0">
-            App Risk <span class="text-info">Analyzer</span>
-        </h3>
-    </div>
-        <div>
-            <a href="/" class="btn btn-success m-3 hd_btn ">
-                Home
-            </a>
+        <a href="/" class="brand" aria-label="App Risk Analyzer home">
+            <img
+                src="{{ url_for('static', filename='images/apklogo.png') }}"
+                alt="App Risk Analyzer logo">
+
+            <h1>App Risk <span>Analyzer</span></h1>
+        </a>
+
+        <div class="nav-links">
+            <a href="/" class="nav-link-custom">Home</a>
+            <a href="/dashboard" class="nav-link-custom">Dashboard</a>
+            <a href="/history"
+               class="nav-link-custom active"
+               aria-current="page">History</a>
+            <a href="/#contact" class="nav-link-custom">Contact us</a>
         </div>
-        <div>
-            <a href="/dashboard" class="btn btn-primary m-3 hd_btn">
-                Dashboard
-            </a>
-        </div>
-        <div>
-            <a href="/history" class="btn btn-secondary m-3 hd_btn">
-                History
-            </a>
-        </div>
-        <div>
-            <a href="/#contact" class="btn btn-info m-3 hd_btn">
-                Contact us
-            </a>
-            
-        </div>
-    </div>
+
+    </nav>
 </header>
 
-<div class="container mt-5">
+<main class="history-main">
 
-<h2>Analysis History</h2>
+    <section>
+        <div class="eyebrow">Security intelligence</div>
 
-<table class="table table-bordered">
+        <h2 class="page-title">Analysis History</h2>
 
-<tr>
+        <p class="page-description">
+            Review previously analyzed Android applications,
+            their assessed risk scores, and their security verdicts.
+        </p>
+    </section>
 
-<th>App</th>
+    <section class="history-panel" aria-label="APK analysis history">
 
-<th>Package</th>
+        <div class="panel-header">
+            <div>
+                <h3 class="panel-title">Previous Assessments</h3>
+                <p class="panel-subtitle">
+                    Historical results from your application analyzer.
+                </p>
+            </div>
 
-<th>Version</th>
+            <span class="history-count">
+                {{ history | length }} Records
+            </span>
+        </div>
 
-<th>Score</th>
+        {% if history %}
 
-<th>Verdict</th>
+        <div class="table-responsive">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Application</th>
+                        <th scope="col">Package</th>
+                        <th scope="col">Version</th>
+                        <th scope="col">Risk Score</th>
+                        <th scope="col">Verdict</th>
+                    </tr>
+                </thead>
 
-</tr>
+                <tbody>
+                    {% for app in history %}
+                    {% set verdict = app[4] | string | lower | trim %}
 
-{% for app in history %}
+                    <tr>
+                        <td>
+                            <div class="app-name">
+                                {{ app[0] if app[0] else 'Unknown App' }}
+                            </div>
+                        </td>
 
-<tr>
+                        <td>
+                            <div class="package-name">
+                                {{ app[1] if app[1] else 'Not available' }}
+                            </div>
+                        </td>
 
-<td>{{ app[0] }}</td>
-<td>{{ app[1] }}</td>
-<td>{{ app[2] }}</td>
-<td>{{ app[3] }}</td>
-<td>{{ app[4] }}</td>
+                        <td>
+                            <div class="version-text">
+                                {{ app[2] if app[2] else 'Not available' }}
+                            </div>
+                        </td>
 
-</tr>
+                        <td>
+                            <span class="score-value">
+                                {{ app[3] if app[3] is not none else 'N/A' }}
+                                {% if app[3] is not none %}/100{% endif %}
+                            </span>
+                        </td>
 
-{% endfor %}
+                        <td>
+                            <span class="verdict-badge
+                                {% if 'high' in verdict %}
+                                    verdict-high
+                                {% elif 'medium' in verdict %}
+                                    verdict-medium
+                                {% elif 'low' in verdict %}
+                                    verdict-low
+                                {% endif %}">
+                                {{ app[4] if app[4] else 'Unknown' }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-</table>
+        <div class="panel-footer">
+            Risk scores and verdicts reflect the stored assessment results.
+            Review the original findings for further details.
+        </div>
 
-</div>
+        {% else %}
+
+        <div class="empty-state">
+            <div class="empty-icon" aria-hidden="true">▤</div>
+
+            <h3 class="empty-title">No Analysis History Yet</h3>
+
+            <p class="empty-description">
+                Your previous APK assessments will appear here after
+                they have been saved by the application.
+            </p>
+
+            <a href="/" class="btn-analyze">
+                + Analyze Your First APK
+            </a>
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    App Risk Analyzer &middot; Android Privacy &amp; Security Assessment
+    <br>
+    © 2026 App Risk Analyzer | Developed by Team KD
+</footer>
 
 </body>
 </html>

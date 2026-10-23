@@ -1,153 +1,691 @@
+
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Dashboard</title>
+    <title>Security Dashboard | App Risk Analyzer</title>
+    <meta name="theme-color" content="#0b1220">
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/theme.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --dash-bg: #0b1220;
+            --dash-card: #111c2e;
+            --dash-border: #26354b;
+            --dash-text: #edf4ff;
+            --dash-muted: #94a8c5;
+            --dash-cyan: #00d4ff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--dash-bg) !important;
+            color: var(--dash-text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .dashboard-header {
+            background: #0e192b;
+            border-bottom: 1px solid var(--dash-border);
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-inner {
+            max-width: 1440px;
+            margin: auto;
+            min-height: 88px;
+            padding: 12px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .brand img {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            margin: 0;
+            font-size: 21px;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .brand-name span {
+            color: var(--dash-cyan);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .nav-link-custom {
+            color: #c2cee0;
+            padding: 10px 14px;
+            border-radius: 9px;
+            font-size: 14px;
+            transition: background .2s, color .2s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            color: var(--dash-cyan);
+            background: #192b42;
+        }
+
+        .dashboard-container {
+            max-width: 1440px;
+            margin: auto;
+            padding: 38px 28px 52px;
+        }
+
+        .eyebrow {
+            color: var(--dash-cyan);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .page-title {
+            color: #fff;
+            font-size: clamp(26px, 3vw, 36px);
+            font-weight: 750;
+            margin: 0 0 10px;
+        }
+
+        .page-subtitle {
+            color: var(--dash-muted);
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        .section-heading {
+            color: #fff;
+            font-size: 19px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .section-caption {
+            color: var(--dash-muted);
+            font-size: 13px;
+            margin: 7px 0 0;
+            line-height: 1.6;
+        }
+
+        .stat-card {
+            height: 100%;
+            min-height: 155px;
+            background: var(--dash-card);
+            border: 1px solid var(--dash-border);
+            border-radius: 16px;
+            padding: 23px;
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, border-color .2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: #405675;
+        }
+
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+        }
+
+        .stat-label {
+            color: var(--dash-muted);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 17px;
+        }
+
+        .stat-number {
+            color: #fff;
+            font-size: clamp(30px, 3vw, 38px);
+            font-weight: 750;
+            line-height: 1.2;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-description {
+            color: var(--dash-muted);
+            font-size: 12px;
+            margin-top: 9px;
+        }
+
+        .stat-icon {
+            display: inline-flex;
+            width: 36px;
+            height: 36px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: var(--icon-bg);
+            color: var(--accent);
+            font-size: 19px;
+            margin-bottom: 15px;
+        }
+
+        .panel {
+            height: 100%;
+            background: var(--dash-card);
+            border: 1px solid var(--dash-border);
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .risk-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .average-score {
+            color: var(--dash-cyan);
+            font-size: clamp(38px, 5vw, 54px);
+            font-weight: 800;
+            line-height: 1.2;
+            margin: 25px 0 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .score-unit {
+            color: var(--dash-muted);
+            font-size: 17px;
+            font-weight: 500;
+        }
+
+        .score-scale {
+            display: flex;
+            gap: 5px;
+            margin: 22px 0 10px;
+        }
+
+        .score-scale span {
+            height: 6px;
+            flex: 1;
+            border-radius: 5px;
+            background: #304058;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            color: var(--dash-muted);
+            font-size: 11px;
+        }
+
+        .score-note {
+            margin-top: auto;
+            padding-top: 25px;
+            color: var(--dash-muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .chart-wrap {
+            position: relative;
+            width: 100%;
+            height: 290px;
+            margin: 20px auto 5px;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 18px;
+            margin-top: 18px;
+            color: var(--dash-muted);
+            font-size: 13px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .legend-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        .action-panel {
+            margin-top: 24px;
+            padding: 24px 26px;
+            background: linear-gradient(110deg, #122943, #112034);
+            border: 1px solid #284764;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .action-title {
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 7px;
+        }
+
+        .action-description {
+            color: var(--dash-muted);
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        .btn-analyze {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 19px;
+            background: var(--dash-cyan);
+            color: #071421;
+            font-size: 14px;
+            font-weight: 700;
+            border: 1px solid var(--dash-cyan);
+            border-radius: 9px;
+            white-space: nowrap;
+            transition: .2s;
+        }
+
+        .btn-analyze:hover {
+            background: #8cecff;
+            color: #071421;
+            border-color: #8cecff;
+        }
+
+        .dashboard-footer {
+            border-top: 1px solid var(--dash-border);
+            padding: 22px 15px;
+            text-align: center;
+            color: var(--dash-muted);
+            font-size: 12px;
+        }
+
+        @media (min-width: 992px) {
+            .dashboard-container {
+                padding-top: 45px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .nav-inner {
+                padding: 15px 16px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+            }
+
+            .brand img {
+                width: 43px;
+                height: 43px;
+            }
+
+            .brand-name {
+                font-size: 19px;
+            }
+
+            .nav-links {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 7px;
+            }
+
+            .nav-link-custom {
+                text-align: center;
+                padding: 11px 8px;
+                font-size: 13px;
+                background: #142238;
+            }
+
+            .dashboard-container {
+                padding: 27px 16px 35px;
+            }
+
+            .stat-card {
+                min-height: 145px;
+                padding: 18px;
+            }
+
+            .panel {
+                padding: 20px;
+            }
+
+            .chart-wrap {
+                height: 260px;
+            }
+
+            .action-panel {
+                padding: 21px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-analyze {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .brand-name {
+                font-size: 17px;
+            }
+
+            .stat-card {
+                padding: 14px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+            }
+
+            .stat-number {
+                font-size: 28px;
+            }
+
+            .panel {
+                padding: 16px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<header>
-    <div class="header">
-        <div class="d-flex align-items-center ms-3">
-        <img src="{{ url_for('static', filename='images/apklogo.png') }}"
-            alt="Logo"
-            width="75"
-            height="75"
-            class="me-2">
+<header class="dashboard-header">
+    <nav class="nav-inner" aria-label="Main navigation">
 
-        <h3 class="text-white m-0">
-            App Risk <span class="text-info">Analyzer</span>
-        </h3>
-    </div>
-        <div>
-            <a href="/" class="btn btn-success m-3 hd_btn ">
-                Home
-            </a>
+        <a href="/" class="brand" aria-label="App Risk Analyzer home">
+            <img
+                src="{{ url_for('static', filename='images/apklogo.png') }}"
+                alt="App Risk Analyzer logo">
+
+            <h1 class="brand-name">
+                App Risk <span>Analyzer</span>
+            </h1>
+        </a>
+
+        <div class="nav-links">
+            <a href="/" class="nav-link-custom">Home</a>
+            <a href="/dashboard"
+               class="nav-link-custom active"
+               aria-current="page">Dashboard</a>
+            <a href="/history" class="nav-link-custom">History</a>
+            <a href="/#contact" class="nav-link-custom">Contact us</a>
         </div>
-        <div>
-            <a href="/dashboard" class="btn btn-primary m-3 hd_btn">
-                Dashboard
-            </a>
-        </div>
-        <div>
-            <a href="/history" class="btn btn-secondary m-3 hd_btn">
-                History
-            </a>
-        </div>
-        <div>
-            <a href="/#contact" class="btn btn-info m-3 hd_btn">
-                Contact us
-            </a>
-        </div>
-        
-    </div>
+
+    </nav>
 </header>
 
-<div class="container mt-5">
+<main class="dashboard-container">
 
-<h2 class="mb-4">📊 App Risk Dashboard</h2>
+    <section class="mb-4">
+        <div class="eyebrow">Security intelligence</div>
+        <h2 class="page-title">App Risk Dashboard</h2>
+        <p class="page-subtitle">
+            Monitor APK security assessments and review the distribution
+            of risk levels across your analyzed applications.
+        </p>
+    </section>
 
-<div class="row">
+    <!-- Statistics -->
+    <section class="row g-3 mb-4" aria-label="Analysis statistics">
 
-<div class="col-md-3">
-<div class="card text-center bg-primary text-white">
-<div class="card-body">
-<h3>{{ stats.total }}</h3>
-<p>Total Apps</p>
-</div>
-</div>
-</div>
+        <div class="col-6 col-lg-3">
+            <article class="stat-card"
+                     style="--accent:#38bdf8;--icon-bg:#15354b;">
+                <div class="stat-icon" aria-hidden="true">▦</div>
+                <div class="stat-label">Total Apps</div>
+                <div class="stat-number">{{ stats.total }}</div>
+                <div class="stat-description">Apps analyzed</div>
+            </article>
+        </div>
 
-<div class="col-md-3">
-<div class="card text-center bg-danger text-white">
-<div class="card-body">
-<h3>{{ stats.high }}</h3>
-<p>High Risk</p>
-</div>
-</div>
-</div>
+        <div class="col-6 col-lg-3">
+            <article class="stat-card"
+                     style="--accent:#fb7185;--icon-bg:#462332;">
+                <div class="stat-icon" aria-hidden="true">!</div>
+                <div class="stat-label">High Risk</div>
+                <div class="stat-number">{{ stats.high }}</div>
+                <div class="stat-description">Require closer review</div>
+            </article>
+        </div>
 
-<div class="col-md-3">
-<div class="card text-center bg-warning">
-<div class="card-body">
-<h3>{{ stats.medium }}</h3>
-<p>Medium Risk</p>
-</div>
-</div>
-</div>
+        <div class="col-6 col-lg-3">
+            <article class="stat-card"
+                     style="--accent:#fbbf24;--icon-bg:#40351d;">
+                <div class="stat-icon" aria-hidden="true">◈</div>
+                <div class="stat-label">Medium Risk</div>
+                <div class="stat-number">{{ stats.medium }}</div>
+                <div class="stat-description">Review recommended</div>
+            </article>
+        </div>
 
-<div class="col-md-3">
-<div class="card text-center bg-success text-white">
-<div class="card-body">
-<h3>{{ stats.low }}</h3>
-<p>Low Risk</p>
-</div>
-</div>
-</div>
+        <div class="col-6 col-lg-3">
+            <article class="stat-card"
+                     style="--accent:#4ade80;--icon-bg:#183b30;">
+                <div class="stat-icon" aria-hidden="true">✓</div>
+                <div class="stat-label">Low Risk</div>
+                <div class="stat-number">{{ stats.low }}</div>
+                <div class="stat-description">Lower assessed risk</div>
+            </article>
+        </div>
 
-</div>
+    </section>
 
-<br>
+    <!-- Risk score and chart -->
+    <section class="row g-3">
 
-<div class="card">
-<div class="card-body">
+        <div class="col-12 col-lg-5">
+            <article class="panel risk-panel">
+                <div>
+                    <div class="eyebrow">Overall assessment</div>
+                    <h3 class="section-heading">Average Risk Score</h3>
+                    <p class="section-caption">
+                        Average score across analyzed applications.
+                    </p>
+                </div>
 
-<h4>Average Risk Score</h4>
+                <div class="average-score">
+                    {{ stats.average }}<span class="score-unit"> / 100</span>
+                </div>
 
-<h2>{{ stats.average }}/100</h2>
+                <div class="score-scale" aria-hidden="true">
+                    <span style="background:#4ade80;"></span>
+                    <span style="background:#a3e635;"></span>
+                    <span style="background:#fbbf24;"></span>
+                    <span style="background:#fb923c;"></span>
+                    <span style="background:#fb7185;"></span>
+                </div>
 
-</div>
-</div>
+                <div class="scale-labels">
+                    <span>Lower score</span>
+                    <span>Higher score</span>
+                </div>
 
-<br>
+                <p class="score-note">
+                    Scores summarize your existing assessment results.
+                    Review individual APK findings and permissions before
+                    making security decisions.
+                </p>
+            </article>
+        </div>
 
-<div style="width: 350px; height: 350px; margin: auto;">
-    <canvas id="pieChart"></canvas>
-</div>
+        <div class="col-12 col-lg-7">
+            <article class="panel">
+                <div>
+                    <div class="eyebrow">Risk distribution</div>
+                    <h3 class="section-heading">Application Risk Breakdown</h3>
+                    <p class="section-caption">
+                        Distribution of high-, medium-, and low-risk results.
+                    </p>
+                </div>
+
+                <div class="chart-wrap">
+                    <canvas
+                        id="pieChart"
+                        role="img"
+                        aria-label="Pie chart showing high, medium, and low risk application counts">
+                    </canvas>
+                </div>
+
+                <div class="chart-legend" aria-label="Chart legend">
+                    <div class="legend-item">
+                        <span class="legend-dot"
+                              style="background:#fb7185;"></span>
+                        High Risk
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot"
+                              style="background:#fbbf24;"></span>
+                        Medium Risk
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot"
+                              style="background:#4ade80;"></span>
+                        Low Risk
+                    </div>
+                </div>
+            </article>
+        </div>
+
+    </section>
+
+    <!-- Primary action -->
+    <section class="action-panel">
+        <div>
+            <div class="action-title">Ready to assess another APK?</div>
+            <p class="action-description">
+                Upload an Android application to review its permissions
+                and generate a security assessment.
+            </p>
+        </div>
+
+        <a href="/" class="btn-analyze">
+            + Analyze New APK
+        </a>
+    </section>
+
+</main>
+
+<footer class="dashboard-footer">
+    App Risk Analyzer &middot; Android Privacy &amp; Security Assessment
+</footer>
 
 <script>
+    const chartCanvas = document.getElementById("pieChart");
 
-const ctx = document.getElementById('pieChart');
+    const riskCounts = [
+        {{ stats.high | tojson }},
+        {{ stats.medium | tojson }},
+        {{ stats.low | tojson }}
+    ];
 
-new Chart(ctx, {
-    type: 'pie',
+    new Chart(chartCanvas, {
+        type: "doughnut",
 
-    data: {
-        labels: ['High', 'Medium', 'Low'],
-        datasets: [{
-            data: [
-                {{ stats.high }},
-                {{ stats.medium }},
-                {{ stats.low }}
-            ]
-        }]
-    },
+        data: {
+            labels: ["High Risk", "Medium Risk", "Low Risk"],
+            datasets: [{
+                data: riskCounts,
+                backgroundColor: [
+                    "#fb7185",
+                    "#fbbf24",
+                    "#4ade80"
+                ],
+                borderColor: "#111c2e",
+                borderWidth: 5,
+                hoverOffset: 8
+            }]
+        },
 
-    options: {
-        responsive: true,
-        maintainAspectRatio: false
-    }
-});
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "62%",
 
+            plugins: {
+                legend: {
+                    display: false
+                },
+
+                tooltip: {
+                    backgroundColor: "#0b1220",
+                    titleColor: "#ffffff",
+                    bodyColor: "#dce8f8",
+                    padding: 12,
+                    cornerRadius: 8,
+
+                    callbacks: {
+                        label: function(context) {
+                            return " " + context.label + ": " +
+                                context.raw + " apps";
+                        }
+                    }
+                }
+            }
+        }
+    });
 </script>
 
-<br>
-
-<a href="/" class="btn btn-primary">
-Analyze New APK
-</a>
-
-
-</div>
-
 </body>
-
 </html>

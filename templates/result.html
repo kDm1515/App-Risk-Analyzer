@@ -1,185 +1,846 @@
-<!DOCTYPE html>
-<html>
 
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>App Risk Analyzer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Analysis Results | App Risk Analyzer</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+
+    <style>
+        :root {
+            --bg: #0b1220;
+            --card: #111c2e;
+            --border: #26354b;
+            --text: #edf4ff;
+            --muted: #94a8c5;
+            --cyan: #00d4ff;
+            --green: #28d99a;
+            --yellow: #ffc857;
+            --red: #ff667a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        
+.navbar-custom {
+    background: #0e192a;
+    border-bottom: 1px solid #26354b;
+    padding: 13px 0;
+}
+
+.navbar-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    color: #00d4ff;
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.brand img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    border-radius: 12px;
+    background: #fffaf4;
+    padding: 4px;
+}
+
+.brand:hover {
+    color: #0066ff;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-links a {
+    color: #b6c5da;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.nav-links a:hover {
+    color: #00d4ff;
+    background: rgba(0, 212, 255, 0.08);
+}
+
+@media (max-width: 600px) {
+    .navbar-custom {
+        padding: 12px 0;
+    }
+
+    .navbar-inner {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .brand {
+        font-size: 16px;
+    }
+
+    .brand img {
+        width: 38px;
+        height: 38px;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .nav-links a {
+        padding: 9px 12px;
+        font-size: 13px;
+    }
+}
+
+
+        .page-container {
+            width: min(1100px, 94%);
+            margin: 36px auto 55px;
+        }
+
+        .page-heading {
+            margin-bottom: 26px;
+        }
+
+        .eyebrow {
+            color: var(--cyan);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .page-heading h1 {
+            color: var(--text);
+            font-weight: 800;
+            font-size: clamp(27px, 4vw, 38px);
+            margin: 8px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            margin-bottom: 0;
+            line-height: 1.7;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 24px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .panel h2 {
+            font-size: 21px;
+            font-weight: 750;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .section-subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: -12px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .app-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .detail-box {
+            background: #0c1728;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 17px;
+            min-width: 0;
+        }
+
+        .detail-label {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+            margin: 0;
+        }
+
+        .risk-layout {
+            display: grid;
+            grid-template-columns: 190px minmax(0, 1fr);
+            align-items: center;
+            gap: 28px;
+        }
+
+        .score-circle {
+            --score: {{ risk.score }};
+            --score-color: var(--green);
+            width: 165px;
+            height: 165px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            background:
+                radial-gradient(circle, var(--card) 61%, transparent 63%),
+                conic-gradient(var(--score-color) calc(var(--score) * 1%), #26354b 0);
+        }
+
+        .score-high {
+            --score-color: var(--red);
+        }
+
+        .score-medium {
+            --score-color: var(--yellow);
+        }
+
+        .score-low {
+            --score-color: var(--green);
+        }
+
+        .score-number {
+            font-size: 37px;
+            font-weight: 850;
+            line-height: 1.2;
+            color: var(--text);
+        }
+
+        .score-caption {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .risk-description h3 {
+            color: var(--text);
+            font-size: 19px;
+            font-weight: 750;
+            margin-bottom: 10px;
+        }
+
+        .risk-description p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .verdict-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 30px;
+            padding: 9px 15px;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 13px;
+            border: 1px solid currentColor;
+        }
+
+        .verdict-high {
+            color: var(--red);
+            background: rgba(255, 102, 122, 0.09);
+        }
+
+        .verdict-medium {
+            color: var(--yellow);
+            background: rgba(255, 200, 87, 0.09);
+        }
+
+        .verdict-low {
+            color: var(--green);
+            background: rgba(40, 217, 154, 0.09);
+        }
+
+        .progress-custom {
+            height: 10px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #26354b;
+            margin: 18px 0 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+
+        .fill-high {
+            background: var(--red);
+        }
+
+        .fill-medium {
+            background: var(--yellow);
+        }
+
+        .fill-low {
+            background: var(--green);
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .table-responsive-custom {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .permission-table {
+            width: 100%;
+            min-width: 430px;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .permission-table thead {
+            background: #0c1728;
+        }
+
+        .permission-table th {
+            color: var(--muted);
+            font-size: 12px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            font-weight: 750;
+            padding: 15px 17px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .permission-table td {
+            padding: 15px 17px;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            vertical-align: middle;
+            overflow-wrap: anywhere;
+        }
+
+        .permission-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .permission-table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.035);
+        }
+
+        .permission-name {
+            font-weight: 600;
+        }
+
+        .risk-tag {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .tag-high {
+            color: var(--red);
+            background: rgba(255, 102, 122, 0.12);
+        }
+
+        .tag-medium {
+            color: var(--yellow);
+            background: rgba(255, 200, 87, 0.12);
+        }
+
+        .tag-low {
+            color: var(--green);
+            background: rgba(40, 217, 154, 0.12);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--muted);
+            padding: 28px 15px;
+            line-height: 1.7;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 18px;
+        }
+
+        .ai-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 13px;
+            background: rgba(0, 212, 255, 0.1);
+            display: grid;
+            place-items: center;
+            font-size: 23px;
+            flex-shrink: 0;
+        }
+
+        .ai-header h2 {
+            margin-bottom: 5px;
+        }
+
+        .ai-header p {
+            color: var(--muted);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .ai-report {
+            color: #dbe8f9;
+            background: #0a1423;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            line-height: 1.85;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin: 0;
+        }
+
+        .report-note {
+            margin-top: 14px;
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 27px;
+        }
+
+        .btn-custom {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border-radius: 10px;
+            padding: 12px 17px;
+            font-size: 14px;
+            font-weight: 750;
+            border: 1px solid transparent;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary-custom {
+            color: #06111f;
+            background: var(--cyan);
+        }
+
+        .btn-primary-custom:hover {
+            color: #06111f;
+            background: #63e5ff;
+        }
+
+        .btn-secondary-custom {
+            color: var(--text);
+            background: var(--card);
+            border-color: var(--border);
+        }
+
+        .btn-secondary-custom:hover {
+            color: var(--cyan);
+            border-color: var(--cyan);
+        }
+
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 24px 12px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 700px) {
+            .navbar-custom {
+                padding: 12px 0;
+            }
+
+            .navbar-inner {
+                flex-direction: column;
+                gap: 13px;
+            }
+
+            .brand {
+                font-size: 16px;
+            }
+
+            .brand img {
+                width: 36px;
+                height: 36px;
+            }
+
+            .nav-links {
+                justify-content: center;
+                gap: 15px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+
+            .page-container {
+                margin-top: 25px;
+            }
+
+            .panel {
+                padding: 19px 15px;
+                border-radius: 15px;
+            }
+
+            .app-details {
+                grid-template-columns: 1fr;
+            }
+
+            .risk-layout {
+                grid-template-columns: 1fr;
+                gap: 23px;
+                text-align: center;
+            }
+
+            .score-circle {
+                width: 145px;
+                height: 145px;
+            }
+
+            .score-number {
+                font-size: 32px;
+            }
+
+            .risk-description {
+                text-align: left;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-custom {
+                width: 100%;
+            }
+
+            .ai-report {
+                padding: 15px;
+                font-size: 13px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                transition: none !important;
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<div class="container mt-5">
+    
+<nav class="navbar-custom">
+    <div class="container navbar-inner">
 
-    <div class="card shadow">
+        <a href="/" class="brand">
+            <img
+                src="{{ url_for('static', filename='images/apklogo.png') }}"
+                alt="App Risk Analyzer logo"
+            >
+            <span>APP RISK ANALYZER</span>
+        </a>
 
-        <div class="card-header bg-primary text-white">
-            <h2>📱 App Risk Analyzer</h2>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/history">History</a>
         </div>
 
-        <div class="card-body">
+    </div>
+</nav>
 
-            <h3 class="text-primary">{{ app.app_name }}</h3>
 
-            <table class="table table-bordered">
+    <main class="page-container">
 
-                <tr>
-                    <td><b>Package</b></td>
-                    <td>{{ app.package_name }}</td>
-                </tr>
+        <header class="page-heading">
+            <div class="eyebrow">Security assessment</div>
+            <h1>Analysis Results</h1>
+            <p>
+                Review your application's risk score, requested permissions,
+                and AI-generated security assessment.
+            </p>
+        </header>
 
-                <tr>
-                    <td><b>Version</b></td>
-                    <td>{{ app.version_name }}</td>
-                </tr>
+        <!-- Application details -->
+        <section class="panel">
+            <h2>📱 Application Details</h2>
 
-            </table>
-
-            <hr>
-
-            <h3>Risk Score</h3>
-
-            <div class="progress mb-3" style="height:30px;">
-
-                <div
-                    class="progress-bar
-                    {% if risk.score >= 70 %}
-                        bg-danger
-                    {% elif risk.score >= 40 %}
-                        bg-warning
-                    {% else %}
-                        bg-success
-                    {% endif %}"
-                    role="progressbar"
-                    style="width: {{ risk.score }}%;">
-
-                    {{ risk.score }}%
-
+            <div class="app-details">
+                <div class="detail-box">
+                    <div class="detail-label">Application Name</div>
+                    <p class="detail-value">
+                        {{ app.app_name or 'Unknown App' }}
+                    </p>
                 </div>
 
+                <div class="detail-box">
+                    <div class="detail-label">Package Name</div>
+                    <p class="detail-value">
+                        {{ app.package_name or 'Not available' }}
+                    </p>
+                </div>
+
+                <div class="detail-box">
+                    <div class="detail-label">Version</div>
+                    <p class="detail-value">
+                        {{ app.version_name or 'Not available' }}
+                    </p>
+                </div>
+
+                <div class="detail-box">
+                    <div class="detail-label">Assessment</div>
+                    <p class="detail-value">APK privacy and security scan</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Risk score -->
+        <section class="panel">
+            <h2>🛡️ Risk Assessment</h2>
+            <p class="section-subtitle">
+                The score summarizes the risk identified by this analyzer.
+                A higher score indicates greater potential risk.
+            </p>
+
+            {% set score = risk.score | int %}
+            {% set score_class = 'high' if score >= 70 else ('medium' if score >= 40 else 'low') %}
+
+            <div class="risk-layout">
+                <div
+                    class="score-circle score-{{ score_class }}"
+                    role="img"
+                    aria-label="Risk score {{ score }} out of 100"
+                >
+                    <div class="score-number">{{ score }}</div>
+                    <div class="score-caption">OUT OF 100</div>
+                </div>
+
+                <div class="risk-description">
+                    <h3>Overall Risk Verdict</h3>
+
+                    <div class="verdict-badge verdict-{{ score_class }}">
+                        {% if score >= 70 %}
+                            <span>●</span> HIGH RISK
+                        {% elif score >= 40 %}
+                            <span>●</span> MEDIUM RISK
+                        {% else %}
+                            <span>●</span> LOW RISK
+                        {% endif %}
+                    </div>
+
+                    <p>
+                        Analyzer verdict:
+                        <strong>{{ risk.verdict }}</strong>
+                    </p>
+
+                    <div
+                        class="progress-custom"
+                        role="progressbar"
+                        aria-label="Risk score"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow="{{ score }}"
+                    >
+                        <div
+                            class="progress-fill fill-{{ score_class }}"
+                            style="width: {{ [[score, 100] | min, 0] | max }}%;"
+                        ></div>
+                    </div>
+
+                    <div class="scale-labels">
+                        <span>0 — Low</span>
+                        <span>40 — Medium</span>
+                        <span>70 — High</span>
+                        <span>100</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Permissions -->
+        <section class="panel">
+            <h2>🔐 Permission Analysis</h2>
+            <p class="section-subtitle">
+                Review the permissions detected in the APK and their assigned
+                risk categories.
+            </p>
+
+            <div class="table-responsive-custom">
+                <table class="permission-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Permission</th>
+                            <th scope="col">Risk Level</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for p in risk.permissions %}
+                        {% set permission_risk = p.risk | string | lower | trim %}
+
+                        <tr>
+                            <td class="permission-name">
+                                {{ p.permission }}
+                            </td>
+
+                            <td>
+                                {% if permission_risk == 'high' %}
+                                    <span class="risk-tag tag-high">High</span>
+                                {% elif permission_risk == 'medium' %}
+                                    <span class="risk-tag tag-medium">Medium</span>
+                                {% else %}
+                                    <span class="risk-tag tag-low">
+                                        {{ p.risk or 'Low' }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="2">
+                                <div class="empty-state">
+                                    <div style="font-size: 27px;">🔎</div>
+                                    <strong>No permissions listed</strong>
+                                    <div>
+                                        The analyzer did not return any permissions
+                                        for this application.
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- AI security report -->
+        <section class="panel">
+            <div class="ai-header">
+                <div class="ai-icon">🤖</div>
+                <div>
+                    <h2>AI Security Report</h2>
+                    <p>Automated analysis and security recommendations</p>
+                </div>
             </div>
 
-            <h4>
+            <pre class="ai-report">{{ ai_report or 'AI security report is not available for this scan.' }}</pre>
 
-                Verdict :
+            <p class="report-note">
+                Note: This report is an automated assessment, not a guarantee
+                that an application is safe or malicious. Verify important
+                findings before making security decisions.
+            </p>
+        </section>
 
-                <span
-                    class="
-                    {% if risk.score >= 70 %}
-                        text-danger
-                    {% elif risk.score >= 40 %}
-                        text-warning
-                    {% else %}
-                        text-success
-                    {% endif %}
-                    ">
+        <!-- Actions -->
+        <div class="action-buttons">
+            <a href="/" class="btn-custom btn-primary-custom">
+                🔄 Analyze Another APK
+            </a>
 
-                    {{ risk.verdict }}
+            <a
+                class="btn-custom btn-secondary-custom"
+                href="{{ url_for('download', file=pdf_file) }}"
+            >
+                📄 Download PDF Report
+            </a>
 
-                </span>
+            <a href="/dashboard" class="btn-custom btn-secondary-custom">
+                📊 Dashboard
+            </a>
 
-            </h4>
-
-            <hr>
-
-            <h3>Permissions</h3>
-
-            <table class="table table-bordered table-hover">
-
-                <thead class="table-dark">
-                    <tr>
-                        <th>Permission</th>
-                        <th>Risk</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                {% for p in risk.permissions %}
-
-                    <tr>
-
-                        <td>{{ p.permission }}</td>
-
-                        <td>
-
-                            {% if p.risk == "High" %}
-
-                                <span class="badge bg-danger">High</span>
-
-                            {% elif p.risk == "Medium" %}
-
-                                <span class="badge bg-warning text-dark">Medium</span>
-
-                            {% else %}
-
-                                <span class="badge bg-success">Low</span>
-
-                            {% endif %}
-
-                        </td>
-
-                    </tr>
-
-                {% endfor %}
-
-                </tbody>
-
-            </table>
-
-            <hr>
-
-            <div class="alert alert-info">
-
-                <div class="card shadow-lg mt-4">
-
-    <div class="card-header bg-primary text-white">
-        <h4>🤖 AI Security Report</h4>
-    </div>
-
-    <div class="card-body">
-
-        <pre style="white-space: pre-wrap;
-                    font-family: Arial;
-                    font-size:16px;">
-                    {{ ai_report }}
-        </pre>
-
-    </div>
-
-</div>
-
-            </div>
-
-            <div class="d-flex gap-2 mt-4">
-
-                <a href="/" class="btn btn-primary">
-                    🔄 Analyze Another App
-                </a>
-
-                <a
-                    class="btn btn-danger"
-                    href="{{ url_for('download', file=pdf_file) }}">
-
-                    📄 Download PDF Report
-
-                </a>
-
-                <a href="/dashboard" class="btn btn-success">
-                    📊 Dashboard
-                </a>
-
-            </div>
-
+            <a href="/history" class="btn-custom btn-secondary-custom">
+                🕘 Scan History
+            </a>
         </div>
 
-    </div>
+    </main>
 
-</div>
-
-
+    <footer class="footer">
+        <div>App Risk Analyzer · APK Privacy &amp; Security Assessment</div>
+        <div>Use scan results as guidance, not as a guarantee of safety.</div>
+    </footer>
 
 </body>
-
 </html>
